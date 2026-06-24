@@ -1,4 +1,4 @@
-# AasimFxBook — Trading Journal v2.0.
+# AasimFxBook — Trading Journal v2.0
 
 > A professional single-file day trading journal with Firebase backend, real-time sync, and deep performance analytics. Built for serious traders who want to track, review, and improve their edge.
 
