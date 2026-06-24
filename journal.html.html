@@ -1,0 +1,1520 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day Trading Journal</title>
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* CSS variables and global styles */
+      :root {
+        --bg-dark: #12161a;
+        --card-bg: #1a1f25;
+        --header-bg: #1a1f25;
+        --text-color: #f0f0f0;
+
+        /* --- Colors --- */
+        --tab-active-color: #7371ff;
+        --initial-color: #0364ff;
+        --balance-color: #4ac3ff;
+        --profit-color: #8bff8b;
+        --win-rate-color: #10ab34;
+
+        --danger-color: #d65a5a;
+        --accent-color: #6c81a1;
+        --border-color: #37434e;
+        --input-bg: #37434e;
+        --button-bg: #2a313c;
+        --button-hover-bg: #37434e;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-color);
+      }
+
+      /* Helper classes */
+      .text-profit-color {
+        color: var(--profit-color) !important;
+      }
+      .text-danger-color {
+        color: var(--danger-color) !important;
+      }
+      .text-accent-color {
+        color: var(--accent-color) !important;
+      }
+      .text-balance-color {
+        color: var(--balance-color) !important;
+      }
+      .text-initial-color {
+        color: var(--initial-color) !important;
+      }
+      .text-win-rate-color {
+        color: var(--win-rate-color) !important;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--card-bg);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--accent-color);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #5a7090;
+      }
+
+      .custom-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+      }
+
+      .input-field,
+      .select-field {
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+      }
+
+      .button {
+        background-color: var(--button-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        transition: background-color 0.2s;
+      }
+      .button:hover {
+        background-color: var(--button-hover-bg);
+      }
+
+      .header-bg {
+        background-color: var(--header-bg);
+      }
+
+      .active-tab {
+        background-color: var(--card-bg);
+        color: var(--tab-active-color);
+        border-color: var(--tab-active-color);
+      }
+
+      .tab-button {
+        border: 1px solid transparent;
+        transition:
+          border-color 0.2s,
+          color 0.2s;
+      }
+      .tab-button:hover:not(.active-tab) {
+        border-color: var(--accent-color);
+      }
+
+      .trade-row-profit {
+        background-color: rgba(139, 255, 139, 0.1);
+        border-left: 3px solid var(--profit-color);
+      }
+      .trade-row-loss {
+        background-color: rgba(214, 90, 90, 0.1);
+        border-left: 3px solid var(--danger-color);
+      }
+
+      /* Calendar styles */
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 0.5rem;
+      }
+      .calendar-day {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition:
+          background-color 0.2s,
+          border 0.2s;
+        position: relative;
+        border: 1px solid transparent;
+        height: 60px;
+      }
+      .calendar-day-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .calendar-day-date {
+        font-weight: bold;
+        font-size: 0.875rem;
+      }
+      .calendar-day-pnl {
+        font-size: 0.65rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-top: 2px;
+      }
+      .calendar-day:hover {
+        background-color: var(--border-color);
+      }
+      .calendar-day.inactive {
+        color: var(--accent-color);
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      .calendar-day.current-day {
+        border: 1px solid var(--accent-color);
+      }
+      .calendar-profit-day {
+        border: 1px solid var(--profit-color);
+      }
+      .calendar-loss-day {
+        background-color: rgba(214, 90, 90, 0.15);
+        border: 1px solid var(--danger-color);
+      }
+      .trade-count-badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background-color: var(--profit-color);
+        color: var(--bg-dark);
+        font-size: 0.6rem;
+        font-weight: bold;
+        border-radius: 9999px;
+        padding: 0 4px;
+        min-width: 16px;
+        text-align: center;
+      }
+      .calendar-loss-day .trade-count-badge {
+        background-color: var(--danger-color);
+      }
+    </style>
+  </head>
+
+  <body class="p-4 sm:p-6 lg:p-8">
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto space-y-8 relative">
+      <!-- Header -->
+      <header
+        class="flex items-center justify-between p-4 rounded-xl custom-card header-bg shadow-lg"
+      >
+        <h1 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+          <i class="fas fa-chart-line text-profit-color"></i> Trading Journal
+        </h1>
+        <div class="flex items-center gap-2 sm:gap-4 text-sm sm:text-base">
+          <button
+            id="journalTabBtn"
+            class="tab-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold active-tab transition-all duration-300 ease-in-out"
+          >
+            Journal
+          </button>
+          <button
+            id="analyticsTabBtn"
+            class="tab-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-all duration-300 ease-in-out"
+          >
+            Analytics
+          </button>
+          <div class="h-6 w-px bg-border-color mx-1"></div>
+          <button
+            id="settingsBtn"
+            class="text-accent-color hover:text-white transition-colors p-2"
+            title="Settings"
+          >
+            <i class="fas fa-cog fa-lg"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Journal Section -->
+      <div
+        id="journalSection"
+        class="tab-content transition-all duration-300 ease-in-out space-y-6"
+      >
+        <!-- Journal Status Bar -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="custom-card p-4 flex flex-col justify-center">
+            <p
+              class="text-xs text-accent-color font-medium uppercase tracking-wider"
+            >
+              Initial Balance
+            </p>
+            <p id="journalInitialBalance" class="text-lg font-bold">$0.00</p>
+          </div>
+          <div class="custom-card p-4 flex flex-col justify-center">
+            <p
+              class="text-xs text-accent-color font-medium uppercase tracking-wider"
+            >
+              Current Balance
+            </p>
+            <p id="journalCurrentBalance" class="text-lg font-bold">$0.00</p>
+          </div>
+          <div class="custom-card p-4 flex flex-col justify-center">
+            <p
+              class="text-xs text-accent-color font-medium uppercase tracking-wider"
+            >
+              Total P&L
+            </p>
+            <p id="journalTotalPnL" class="text-lg font-bold">$0.00</p>
+          </div>
+          <div class="custom-card p-4 flex flex-col justify-center">
+            <p
+              class="text-xs text-accent-color font-medium uppercase tracking-wider"
+            >
+              Win Rate
+            </p>
+            <p id="journalWinRate" class="text-lg font-bold">0%</p>
+          </div>
+        </div>
+
+        <!-- Main Journal Content Grid -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-8"
+        >
+          <!-- Calendar Section -->
+          <div
+            class="md:col-span-1 lg:col-span-1 p-6 space-y-4 custom-card shadow-lg"
+          >
+            <div
+              class="flex items-center justify-between border-b border-border-color pb-4"
+            >
+              <button
+                id="prevMonthBtn"
+                class="text-accent-color hover:text-white transition-colors"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <h2 id="currentMonthYear" class="text-lg font-bold"></h2>
+              <button
+                id="nextMonthBtn"
+                class="text-accent-color hover:text-white transition-colors"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+            <div
+              class="grid grid-cols-7 text-center font-semibold text-sm text-accent-color"
+            >
+              <div>Sun</div>
+              <div>Mon</div>
+              <div>Tue</div>
+              <div>Wed</div>
+              <div>Thu</div>
+              <div>Fri</div>
+              <div>Sat</div>
+            </div>
+            <div id="calendar" class="calendar-grid"></div>
+          </div>
+
+          <!-- Trade Entry Form -->
+          <div class="lg:col-span-1 p-6 space-y-6 custom-card shadow-lg">
+            <h2
+              class="text-lg sm:text-xl font-bold border-b border-border-color pb-4"
+            >
+              New Trade
+            </h2>
+            <form id="tradeForm" class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="symbol" class="block text-sm font-medium mb-1"
+                    >Symbol</label
+                  >
+                  <input
+                    type="text"
+                    id="symbol"
+                    name="symbol"
+                    class="w-full px-3 py-2 input-field text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="side" class="block text-sm font-medium mb-1"
+                    >Side</label
+                  >
+                  <select
+                    id="side"
+                    name="side"
+                    class="w-full px-3 py-2 select-field text-sm"
+                    required
+                  >
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Session Dropdown -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="date" class="block text-sm font-medium mb-1"
+                    >Date</label
+                  >
+                  <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    class="w-full px-3 py-2 input-field text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="session" class="block text-sm font-medium mb-1"
+                    >Session</label
+                  >
+                  <select
+                    id="session"
+                    name="session"
+                    class="w-full px-3 py-2 select-field text-sm"
+                    required
+                  >
+                    <option value="Asian">Asian</option>
+                    <option value="London">London</option>
+                    <option value="New York">New York</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="profit" class="block text-sm font-medium mb-1"
+                  >P&L ($)</label
+                >
+                <input
+                  type="number"
+                  step="0.01"
+                  id="profit"
+                  name="profit"
+                  class="w-full px-3 py-2 input-field text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label for="url" class="block text-sm font-medium mb-1"
+                  >Position URL</label
+                >
+                <input
+                  type="url"
+                  id="url"
+                  name="url"
+                  class="w-full px-3 py-2 input-field text-sm"
+                  placeholder="e.g., https://example.com/chart.png"
+                />
+              </div>
+              <div>
+                <label for="notes" class="block text-sm font-medium mb-1"
+                  >Notes</label
+                >
+                <textarea
+                  id="notes"
+                  name="notes"
+                  rows="4"
+                  class="w-full px-3 py-2 input-field text-sm"
+                  placeholder="Enter notes about the trade..."
+                ></textarea>
+              </div>
+              <div class="flex gap-2 mt-4">
+                <button
+                  type="submit"
+                  class="button w-full py-2 rounded-lg font-bold hover:bg-opacity-90 transition-colors duration-200"
+                >
+                  Save Trade
+                </button>
+                <button
+                  type="button"
+                  id="exportCsvBtn"
+                  class="button w-full py-2 rounded-lg font-bold hover:bg-opacity-90 transition-colors duration-200"
+                >
+                  Export CSV
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Trade List Section -->
+        <div class="custom-card p-6 shadow-lg space-y-4">
+          <h2
+            class="text-lg sm:text-xl font-bold border-b border-border-color pb-4"
+          >
+            Recent Trades
+          </h2>
+          <div id="tradeList" class="space-y-2 overflow-y-auto max-h-96">
+            <p class="text-accent-color text-center p-4" id="loadingMessage">
+              Loading trades...
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Section -->
+      <div
+        id="analyticsSection"
+        class="tab-content transition-all duration-300 ease-in-out hidden"
+      >
+        <div class="custom-card p-6 shadow-lg space-y-8">
+          <h2
+            class="text-lg sm:text-xl font-bold border-b border-border-color pb-4"
+          >
+            Performance Analytics
+          </h2>
+
+          <!-- Metrics Grid -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+            <!-- Row 1 -->
+            <div
+              class="custom-card p-4 flex flex-col items-start gap-1 col-span-1"
+            >
+              <i class="fas fa-wallet text-accent-color text-xl"></i>
+              <p class="text-sm font-medium text-accent-color">
+                Initial Balance
+              </p>
+              <p
+                id="initialBalanceDisplay"
+                class="text-xl font-bold text-initial-color"
+              >
+                $0.00
+              </p>
+            </div>
+            <div
+              class="custom-card p-4 flex flex-col items-start gap-1 col-span-1"
+            >
+              <i class="fas fa-coins text-balance-color text-xl"></i>
+              <p class="text-sm font-medium text-accent-color">
+                Current Balance
+              </p>
+              <p
+                id="currentBalanceDisplay"
+                class="text-xl font-bold text-balance-color"
+              >
+                $0.00
+              </p>
+            </div>
+            <div
+              class="custom-card p-4 flex flex-col items-start gap-1 col-span-1"
+            >
+              <i class="fas fa-dollar-sign text-profit-color text-xl"></i>
+              <p class="text-sm font-medium text-accent-color">Total P&L</p>
+              <p id="totalPnLDisplay" class="text-xl font-bold">$0.00</p>
+            </div>
+            <div
+              class="custom-card p-4 flex flex-col items-start gap-1 col-span-1"
+            >
+              <i class="fas fa-percent text-accent-color text-xl"></i>
+              <p class="text-sm font-medium text-accent-color">Win Ratio</p>
+              <p id="winRatioDisplay" class="text-xl font-bold">0%</p>
+            </div>
+
+            <!-- Row 2 -->
+            <div
+              class="custom-card p-4 flex flex-col items-start gap-1 col-span-1"
+            >
+              <i class="fas fa-arrow-trend-up text-profit-color text-xl"></i>
+              <p class="text-sm font-medium text-accent-color">Long P&L</p>
+              <p id="longPnLDisplay" class="text-xl font-bold">$0.00</p>
+            </div>
+            <div
+              class="custom-card p-4 flex flex-col items-start gap-1 col-span-1"
+            >
+              <i class="fas fa-arrow-trend-down text-danger-color text-xl"></i>
+              <p class="text-sm font-medium text-accent-color">Short P&L</p>
+              <p id="shortPnLDisplay" class="text-xl font-bold">$0.00</p>
+            </div>
+            <div
+              class="custom-card p-4 flex flex-col items-start gap-1 col-span-1"
+            >
+              <i class="fas fa-trophy text-profit-color text-xl"></i>
+              <p class="text-sm font-medium text-accent-color">Best Trade</p>
+              <p id="bestTradeDisplay" class="text-xl font-bold">$0.00</p>
+            </div>
+            <div
+              class="custom-card p-4 flex flex-col items-start gap-1 col-span-1"
+            >
+              <i class="fas fa-ban text-danger-color text-xl"></i>
+              <p class="text-sm font-medium text-accent-color">Worst Trade</p>
+              <p id="worstTradeDisplay" class="text-xl font-bold">$0.00</p>
+            </div>
+          </div>
+
+          <!-- Account Performance (Equity Curve) -->
+          <div class="w-full custom-card p-6">
+            <h3 class="text-base sm:text-lg font-bold mb-4">
+              Account Performance
+            </h3>
+            <div class="w-full h-64 md:h-80">
+              <canvas id="equityCurveChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Charts Row 1 -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
+            <div
+              class="custom-card p-6 flex flex-col items-center justify-center"
+            >
+              <h3 class="text-base sm:text-lg font-bold mb-4">
+                Session Performance
+              </h3>
+              <div class="w-full h-64">
+                <canvas id="sessionPerformanceChart"></canvas>
+              </div>
+            </div>
+            <div class="custom-card p-6 flex flex-col items-center">
+              <h3 class="text-base sm:text-lg font-bold mb-4">
+                Best Performing Instruments
+              </h3>
+              <div class="w-full h-64">
+                <canvas id="bestInstrumentsChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day of Week Analysis (New) -->
+          <div class="custom-card p-6 space-y-6">
+            <h3
+              class="text-base sm:text-lg font-bold border-b border-border-color pb-4"
+            >
+              Day of Week Analysis
+            </h3>
+
+            <!-- Day Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div
+                class="p-4 rounded-lg bg-input-bg border border-border-color"
+              >
+                <p class="text-xs text-accent-color font-medium uppercase">
+                  Best Day
+                </p>
+                <p
+                  id="bestDayDisplay"
+                  class="text-lg font-bold text-profit-color"
+                >
+                  -
+                </p>
+              </div>
+              <div
+                class="p-4 rounded-lg bg-input-bg border border-border-color"
+              >
+                <p class="text-xs text-accent-color font-medium uppercase">
+                  Day to Avoid
+                </p>
+                <p
+                  id="worstDayDisplay"
+                  class="text-lg font-bold text-danger-color"
+                >
+                  -
+                </p>
+              </div>
+              <div
+                class="p-4 rounded-lg bg-input-bg border border-border-color"
+              >
+                <p class="text-xs text-accent-color font-medium uppercase">
+                  Average Daily P&L
+                </p>
+                <p id="averageDailyDisplay" class="text-lg font-bold">-</p>
+              </div>
+            </div>
+
+            <!-- Day Chart -->
+            <div class="w-full h-64">
+              <canvas id="dayOfWeekChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div
+      id="settingsModal"
+      class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 backdrop-blur-sm"
+    >
+      <div
+        class="custom-card p-6 w-full max-w-md space-y-6 transform scale-100 transition-transform"
+      >
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <i class="fas fa-cog text-accent-color"></i> Settings
+        </h2>
+        <div>
+          <label
+            for="initialBalanceInput"
+            class="block text-sm font-medium mb-2 text-accent-color"
+            >Initial Account Balance ($)</label
+          >
+          <input
+            type="number"
+            step="0.01"
+            id="initialBalanceInput"
+            class="w-full px-4 py-3 input-field text-lg"
+            placeholder="0.00"
+          />
+        </div>
+        <div class="flex gap-3">
+          <button
+            id="cancelSettingsBtn"
+            class="button flex-1 py-2 rounded-lg font-semibold"
+          >
+            Cancel
+          </button>
+          <button
+            id="saveSettingsBtn"
+            class="bg-profit-color text-black hover:bg-opacity-90 transition-colors flex-1 py-2 rounded-lg font-bold"
+          >
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import {
+        getAuth,
+        signInAnonymously,
+        signInWithCustomToken,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        deleteDoc,
+        addDoc,
+        onSnapshot,
+        collection,
+        query,
+        setDoc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+      import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+      setLogLevel("Debug");
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB4w3eFdIjigrLIT1MoXIm_WteVpL6gdfA",
+        authDomain: "trading-journal-2025-09.firebaseapp.com",
+        projectId: "trading-journal-2025-09",
+        storageBucket: "trading-journal-2025-09.firebasestorage.app",
+        messagingSenderId: "13238776469",
+        appId: "1:13238776469:web:60ab5bb8b06035222e619c",
+      };
+
+      const appId =
+        typeof __app_id !== "undefined" ? __app_id : firebaseConfig.projectId;
+
+      let db, auth, userId, unsubscribe;
+      let trades = [];
+      let initialBalance = 0;
+      let bestInstrumentsChart,
+        equityCurveChart,
+        sessionPerformanceChart,
+        dayOfWeekChart;
+      let currentMonth, currentYear;
+
+      const varColors = {
+        profitColor: "#8bff8b",
+        dangerColor: "#D65A5A",
+        accentColor: "#6C81A1",
+        textColor: "#f0f0f0",
+        borderColor: "#37434E",
+        chartBlue: "#4ac3ff",
+        chartBlueDark: "#0364ff",
+      };
+
+      const tradeForm = document.getElementById("tradeForm");
+      const journalTabBtn = document.getElementById("journalTabBtn");
+      const analyticsTabBtn = document.getElementById("analyticsTabBtn");
+      const journalSection = document.getElementById("journalSection");
+      const analyticsSection = document.getElementById("analyticsSection");
+      const tradeListEl = document.getElementById("tradeList");
+      const calendarEl = document.getElementById("calendar");
+      const currentMonthYearEl = document.getElementById("currentMonthYear");
+      const prevMonthBtn = document.getElementById("prevMonthBtn");
+      const nextMonthBtn = document.getElementById("nextMonthBtn");
+
+      // Settings
+      const settingsBtn = document.getElementById("settingsBtn");
+      const settingsModal = document.getElementById("settingsModal");
+      const cancelSettingsBtn = document.getElementById("cancelSettingsBtn");
+      const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+      const initialBalanceInput = document.getElementById(
+        "initialBalanceInput",
+      );
+
+      // Helper to format currency
+      const formatCurrency = (amount) => {
+        const colorClass =
+          amount >= 0 ? "text-profit-color" : "text-danger-color";
+        const formatted = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount);
+        return `<span class="${colorClass}">${formatted}</span>`;
+      };
+      const formatCurrencyPlain = (amount) => {
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(amount);
+      };
+      const formatCurrencyCalendar = (amount) => {
+        const colorClass =
+          amount >= 0 ? "text-profit-color" : "text-danger-color";
+        const formatted = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        })
+          .format(amount)
+          .replace(".00", "");
+        return `<span class="${colorClass} calendar-day-pnl">${formatted}</span>`;
+      };
+
+      const initializeFirebase = async () => {
+        try {
+          const config =
+            typeof __firebase_config !== "undefined"
+              ? JSON.parse(__firebase_config)
+              : firebaseConfig;
+          const app = initializeApp(config);
+          db = getFirestore(app);
+          auth = getAuth(app);
+          console.log("Firebase initialized.");
+
+          const initialAuthToken =
+            typeof __initial_auth_token !== "undefined"
+              ? __initial_auth_token
+              : null;
+          if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+          } else {
+            await signInAnonymously(auth);
+          }
+
+          onAuthStateChanged(auth, async (user) => {
+            if (user) {
+              userId = user.uid;
+              await loadSettings();
+              setupRealtimeTradeListener();
+            }
+          });
+        } catch (error) {
+          console.error("Error initializing Firebase:", error);
+        }
+      };
+
+      const getTradesCollection = () => {
+        const collectionAppId =
+          typeof __app_id !== "undefined" ? __app_id : firebaseConfig.projectId;
+        return collection(
+          db,
+          `artifacts/${collectionAppId}/public/data/trades`,
+        );
+      };
+
+      const toggleSettingsModal = () => {
+        const isHidden = settingsModal.classList.contains("hidden");
+        if (isHidden) {
+          settingsModal.classList.remove("hidden");
+          initialBalanceInput.value = initialBalance;
+        } else {
+          settingsModal.classList.add("hidden");
+        }
+      };
+
+      const loadSettings = async () => {
+        if (!db) return;
+        const collectionAppId =
+          typeof __app_id !== "undefined" ? __app_id : firebaseConfig.projectId;
+        const settingsRef = doc(
+          db,
+          `artifacts/${collectionAppId}/public/data/settings`,
+          "config",
+        );
+        try {
+          const docSnap = await getDoc(settingsRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            initialBalance = parseFloat(data.initialBalance) || 0;
+          }
+        } catch (e) {
+          console.error("Error loading settings", e);
+        }
+      };
+
+      const saveSettings = async () => {
+        if (!db) return;
+        const newBalance = parseFloat(initialBalanceInput.value) || 0;
+        const collectionAppId =
+          typeof __app_id !== "undefined" ? __app_id : firebaseConfig.projectId;
+        const settingsRef = doc(
+          db,
+          `artifacts/${collectionAppId}/public/data/settings`,
+          "config",
+        );
+        try {
+          await setDoc(
+            settingsRef,
+            { initialBalance: newBalance },
+            { merge: true },
+          );
+          initialBalance = newBalance;
+          updateAnalyticsDashboard(trades);
+          toggleSettingsModal();
+        } catch (e) {
+          alert("Failed to save settings.");
+        }
+      };
+
+      const saveTrade = async (trade) => {
+        if (!userId || !db) return;
+        try {
+          await addDoc(getTradesCollection(), {
+            ...trade,
+            profit: parseFloat(trade.profit),
+            userId: userId,
+            timestamp: new Date().toISOString(),
+          });
+        } catch (error) {
+          console.error("Error saving trade:", error);
+        }
+      };
+
+      const setupRealtimeTradeListener = () => {
+        if (unsubscribe) unsubscribe();
+        if (!db || !userId) return;
+        const q = query(getTradesCollection());
+        unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            trades = snapshot.docs
+              .map((doc) => {
+                const data = doc.data();
+                return {
+                  id: doc.id,
+                  ...data,
+                  profit: parseFloat(data.profit || 0),
+                };
+              })
+              .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            document.getElementById("loadingMessage")?.remove();
+            renderTradesList(trades);
+            updateAnalyticsDashboard(trades);
+            updateCalendar(trades);
+          },
+          (error) => console.error("Error getting trades:", error),
+        );
+      };
+
+      const renderTradesList = (trades) => {
+        tradeListEl.innerHTML = "";
+        if (trades.length === 0) {
+          tradeListEl.innerHTML =
+            '<p class="text-accent-color text-center p-4">No trades recorded yet. Add one above!</p>';
+          return;
+        }
+        trades.forEach((trade) => {
+          const isProfit = trade.profit > 0;
+          const rowClass = isProfit ? "trade-row-profit" : "trade-row-loss";
+          const dateDisplay = new Date(trade.date).toLocaleDateString();
+          const sessionDisplay = trade.session
+            ? `<span class="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-700 text-gray-300 ml-2">${trade.session}</span>`
+            : "";
+
+          const tradeElement = document.createElement("div");
+          tradeElement.className = `flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 rounded-lg shadow-md transition-all duration-300 ${rowClass}`;
+          tradeElement.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center w-full sm:w-1/2 gap-2 mb-2 sm:mb-0">
+                <span class="text-sm font-bold w-full sm:w-20 text-white">${trade.symbol.toUpperCase()}</span>
+                <span class="text-xs font-medium px-2 py-0.5 rounded-full ${trade.side === "Long" ? "bg-blue-500/30 text-blue-300" : "bg-orange-500/30 text-orange-300"}">${trade.side}</span>
+                ${sessionDisplay}
+                <span class="text-xs text-accent-color ml-2">${dateDisplay}</span>
+            </div>
+            <div class="flex items-center justify-between w-full sm:w-1/2">
+                <span class="text-sm font-semibold">${formatCurrency(trade.profit)}</span>
+                <button class="text-accent-color hover:text-danger-color transition-colors ml-4 delete-btn" data-id="${trade.id}" title="Delete Trade"><i class="fas fa-trash"></i></button>
+            </div>`;
+          tradeListEl.appendChild(tradeElement);
+        });
+        tradeListEl.querySelectorAll(".delete-btn").forEach((button) => {
+          button.addEventListener("click", (e) => {
+            if (confirm("Delete this trade?"))
+              deleteTrade(e.currentTarget.dataset.id);
+          });
+        });
+      };
+
+      const deleteTrade = async (tradeId) => {
+        if (!userId || !db) return;
+        try {
+          await deleteDoc(doc(getTradesCollection(), tradeId));
+        } catch (error) {
+          console.error("Error deleting trade:", error);
+        }
+      };
+
+      const updateAnalyticsDashboard = (trades) => {
+        const totalPnL = trades.reduce((sum, trade) => sum + trade.profit, 0);
+        const winRatio =
+          trades.length > 0
+            ? (
+                (trades.filter((t) => t.profit > 0).length / trades.length) *
+                100
+              ).toFixed(2)
+            : 0;
+        const currentBalance = initialBalance + totalPnL;
+
+        // Calculate missing metrics
+        const longTrades = trades.filter((t) => t.side === "Long");
+        const shortTrades = trades.filter((t) => t.side === "Short");
+        const longPnL = longTrades.reduce(
+          (sum, trade) => sum + trade.profit,
+          0,
+        );
+        const shortPnL = shortTrades.reduce(
+          (sum, trade) => sum + trade.profit,
+          0,
+        );
+        const bestTrade =
+          trades.length > 0 ? Math.max(...trades.map((t) => t.profit)) : 0;
+        const worstTrade =
+          trades.length > 0 ? Math.min(...trades.map((t) => t.profit)) : 0;
+
+        document.getElementById("initialBalanceDisplay").innerHTML =
+          `<span class="text-initial-color">${formatCurrencyPlain(initialBalance)}</span>`;
+        document.getElementById("currentBalanceDisplay").innerHTML =
+          `<span class="text-balance-color">${formatCurrencyPlain(currentBalance)}</span>`;
+        document.getElementById("totalPnLDisplay").innerHTML =
+          formatCurrency(totalPnL);
+        document.getElementById("winRatioDisplay").innerHTML =
+          `<span class="text-win-rate-color">${winRatio}%</span>`;
+
+        // Update restored metrics
+        document.getElementById("longPnLDisplay").innerHTML =
+          formatCurrency(longPnL);
+        document.getElementById("shortPnLDisplay").innerHTML =
+          formatCurrency(shortPnL);
+        document.getElementById("bestTradeDisplay").innerHTML =
+          formatCurrency(bestTrade);
+        document.getElementById("worstTradeDisplay").innerHTML =
+          formatCurrency(worstTrade);
+
+        // Update Journal Stats
+        const jInit = document.getElementById("journalInitialBalance");
+        if (jInit)
+          jInit.innerHTML = `<span class="text-initial-color">${formatCurrencyPlain(initialBalance)}</span>`;
+        const jCurr = document.getElementById("journalCurrentBalance");
+        if (jCurr)
+          jCurr.innerHTML = `<span class="text-balance-color">${formatCurrencyPlain(currentBalance)}</span>`;
+        const jPnL = document.getElementById("journalTotalPnL");
+        if (jPnL) jPnL.innerHTML = formatCurrency(totalPnL);
+        const jWin = document.getElementById("journalWinRate");
+        if (jWin)
+          jWin.innerHTML = `<span class="text-win-rate-color">${winRatio}%</span>`;
+
+        // Sort chronologically for equity curve
+        const chronologicalTrades = [...trades].sort(
+          (a, b) => new Date(a.date) - new Date(b.date),
+        );
+
+        renderEquityCurve(chronologicalTrades);
+        renderSessionChart(trades);
+        renderBestInstrumentsChart(trades);
+        renderDayOfWeekChart(trades);
+      };
+
+      const renderEquityCurve = (trades) => {
+        const canvas = document.getElementById("equityCurveChart");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+
+        // Gradient fill
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, "rgba(74, 195, 255, 0.5)"); // #4ac3ff
+        gradient.addColorStop(1, "rgba(3, 100, 255, 0.0)"); // #0364ff / transparent
+
+        // Prepare data points: Date -> Cumulative Balance
+        let currentEquity = initialBalance;
+        const labels = [];
+        const dataPoints = [];
+
+        // Add starting point
+        if (trades.length > 0) {
+          labels.push("Start");
+          dataPoints.push(initialBalance);
+        }
+
+        trades.forEach((trade) => {
+          currentEquity += trade.profit;
+          labels.push(
+            new Date(trade.date).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            }),
+          );
+          dataPoints.push(currentEquity);
+        });
+
+        if (equityCurveChart) equityCurveChart.destroy();
+
+        equityCurveChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Account Equity",
+                data: dataPoints,
+                borderColor: varColors.chartBlue,
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { display: false, color: varColors.borderColor },
+                ticks: { color: varColors.accentColor },
+              },
+              y: {
+                grid: { color: varColors.borderColor },
+                ticks: { color: varColors.accentColor },
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                mode: "index",
+                intersect: false,
+                callbacks: {
+                  label: function (context) {
+                    return formatCurrencyPlain(context.raw);
+                  },
+                },
+              },
+            },
+            interaction: {
+              mode: "nearest",
+              axis: "x",
+              intersect: false,
+            },
+          },
+        });
+      };
+
+      const renderSessionChart = (trades) => {
+        const canvas = document.getElementById("sessionPerformanceChart");
+        if (!canvas) return;
+
+        // Aggregate P&L by Session
+        const sessionData = { Asian: 0, London: 0, "New York": 0 };
+        trades.forEach((t) => {
+          const sess = t.session || "Unknown"; // Handle legacy trades without session
+          if (sessionData[sess] !== undefined) {
+            sessionData[sess] += t.profit;
+          } else {
+            // Optionally group unknown/other
+            // sessionData['Other'] = (sessionData['Other'] || 0) + t.profit;
+          }
+        });
+
+        const labels = Object.keys(sessionData);
+        const data = Object.values(sessionData);
+
+        if (sessionPerformanceChart) sessionPerformanceChart.destroy();
+
+        sessionPerformanceChart = new Chart(canvas.getContext("2d"), {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Session P&L",
+                data: data,
+                backgroundColor: data.map((val) =>
+                  val >= 0 ? varColors.profitColor : varColors.dangerColor,
+                ),
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: varColors.textColor },
+              },
+              y: {
+                grid: { color: varColors.borderColor },
+                ticks: { color: varColors.accentColor },
+              },
+            },
+            plugins: { legend: { display: false } },
+          },
+        });
+      };
+
+      const renderBestInstrumentsChart = (trades) => {
+        const canvas = document.getElementById("bestInstrumentsChart");
+        if (!canvas) return;
+
+        const instrumentProfits = trades.reduce((acc, trade) => {
+          acc[trade.symbol] = (acc[trade.symbol] || 0) + trade.profit;
+          return acc;
+        }, {});
+
+        const sortedInstruments = Object.entries(instrumentProfits)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 5);
+
+        if (bestInstrumentsChart) bestInstrumentsChart.destroy();
+
+        bestInstrumentsChart = new Chart(canvas.getContext("2d"), {
+          type: "bar",
+          data: {
+            labels: sortedInstruments.map(([s]) => s),
+            datasets: [
+              {
+                label: "P&L",
+                data: sortedInstruments.map(([, p]) => p),
+                // Use the new blue aesthetic for best instruments
+                backgroundColor: varColors.chartBlue,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y", // Horizontal bars look better for instruments
+            scales: {
+              x: {
+                grid: { color: varColors.borderColor },
+                ticks: { color: varColors.accentColor },
+              },
+              y: {
+                grid: { display: false },
+                ticks: { color: varColors.textColor },
+              },
+            },
+            plugins: { legend: { display: false } },
+          },
+        });
+      };
+
+      const renderDayOfWeekChart = (trades) => {
+        const canvas = document.getElementById("dayOfWeekChart");
+        if (!canvas) return;
+
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const dayData = new Array(7).fill(0);
+        const dayCounts = new Array(7).fill(0);
+
+        trades.forEach((t) => {
+          const [y, m, d] = t.date.split("-").map(Number);
+          const date = new Date(y, m - 1, d); // Construct local date
+          const dayIndex = date.getDay(); // 0 is Sunday
+          dayData[dayIndex] += t.profit;
+          dayCounts[dayIndex]++;
+        });
+
+        // Calculate metrics
+        let bestDayVal = -Infinity,
+          worstDayVal = Infinity;
+        let bestDayName = "-",
+          worstDayName = "-";
+
+        days.forEach((day, idx) => {
+          if (dayCounts[idx] > 0) {
+            if (dayData[idx] > bestDayVal) {
+              bestDayVal = dayData[idx];
+              bestDayName = day;
+            }
+            if (dayData[idx] < worstDayVal) {
+              worstDayVal = dayData[idx];
+              worstDayName = day;
+            }
+          }
+        });
+
+        // If all positive or all negative, logic still holds (biggest profit vs smallest profit/biggest loss)
+        // Adjust display if no trades
+        if (trades.length === 0) {
+          bestDayName = "-";
+          worstDayName = "-";
+        }
+
+        // Avg P&L
+        const activeDays = dayCounts.reduce((a, b) => a + (b > 0 ? 1 : 0), 0); // Count unique active days is tricky here since dayData is aggregate
+        // To get average daily P&L properly, we need unique trading days count, not just days of week buckets.
+        // Let's use simple logic: Total P&L / Unique Dates in trade list
+        const uniqueDates = new Set(trades.map((t) => t.date)).size;
+        const totalPnL = trades.reduce((sum, t) => sum + t.profit, 0);
+        const avgDaily = uniqueDates > 0 ? totalPnL / uniqueDates : 0;
+
+        document.getElementById("bestDayDisplay").innerHTML = bestDayName;
+        document.getElementById("worstDayDisplay").innerHTML = worstDayName;
+        document.getElementById("averageDailyDisplay").innerHTML =
+          formatCurrency(avgDaily);
+
+        if (dayOfWeekChart) dayOfWeekChart.destroy();
+
+        dayOfWeekChart = new Chart(canvas.getContext("2d"), {
+          type: "bar",
+          data: {
+            labels: days,
+            datasets: [
+              {
+                label: "Day P&L",
+                data: dayData,
+                backgroundColor: dayData.map((val) =>
+                  val >= 0 ? varColors.profitColor : varColors.dangerColor,
+                ),
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: varColors.textColor },
+              },
+              y: {
+                grid: { color: varColors.borderColor },
+                ticks: { color: varColors.accentColor },
+              },
+            },
+            plugins: { legend: { display: false } },
+          },
+        });
+      };
+
+      // --- Calendar Functions ---
+
+      const updateCalendar = (trades) => {
+        const dailyAnalysis = trades.reduce((acc, trade) => {
+          const date = trade.date;
+          if (!acc[date]) {
+            acc[date] = { count: 0, totalPnL: 0 };
+          }
+          acc[date].count += 1;
+          acc[date].totalPnL += trade.profit;
+          return acc;
+        }, {});
+
+        renderCalendar(dailyAnalysis);
+      };
+
+      const renderCalendar = (dailyAnalysis = {}) => {
+        if (!calendarEl || !currentMonthYearEl) return;
+
+        calendarEl.innerHTML = "";
+        const today = new Date();
+
+        if (currentMonth === undefined || currentYear === undefined) return;
+
+        const date = new Date(currentYear, currentMonth, 1);
+        const firstDayIndex = date.getDay();
+        const lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const prevLastDay = new Date(currentYear, currentMonth, 0).getDate();
+
+        currentMonthYearEl.textContent = new Date(
+          currentYear,
+          currentMonth,
+        ).toLocaleString("default", { month: "long", year: "numeric" });
+
+        for (let i = firstDayIndex; i > 0; i--) {
+          const dayEl = document.createElement("div");
+          dayEl.classList.add("calendar-day", "inactive");
+          dayEl.innerHTML = `<div class="calendar-day-content"><span class="calendar-day-date">${
+            prevLastDay - i + 1
+          }</span></div>`;
+          calendarEl.appendChild(dayEl);
+        }
+
+        for (let i = 1; i <= lastDay; i++) {
+          const dayEl = document.createElement("div");
+          dayEl.classList.add("calendar-day");
+
+          const formattedDate = `${currentYear}-${String(
+            currentMonth + 1,
+          ).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+          dayEl.dataset.date = formattedDate;
+
+          let dayContentHtml = `<div class="calendar-day-content"><span class="calendar-day-date">${i}</span></div>`;
+
+          const isToday =
+            i === today.getDate() &&
+            currentMonth === today.getMonth() &&
+            currentYear === today.getFullYear();
+          if (isToday) {
+            dayEl.classList.add("current-day");
+          }
+
+          if (
+            dailyAnalysis[formattedDate] &&
+            dailyAnalysis[formattedDate].count > 0
+          ) {
+            const { count: tradeCount, totalPnL } =
+              dailyAnalysis[formattedDate];
+
+            if (totalPnL < 0) {
+              dayEl.classList.add("calendar-loss-day");
+              if (isToday) dayEl.classList.remove("current-day");
+            } else if (totalPnL > 0) {
+              dayEl.classList.add("calendar-profit-day");
+              if (isToday) dayEl.classList.remove("current-day");
+            }
+
+            dayContentHtml += formatCurrencyCalendar(totalPnL);
+
+            const badge = document.createElement("span");
+            badge.textContent = tradeCount;
+            badge.classList.add("trade-count-badge");
+            dayEl.appendChild(badge);
+
+            dayEl.addEventListener("click", () => {
+              alert(
+                `Traded ${tradeCount} time(s) on ${formattedDate}. Daily P&L: ${formatCurrencyPlain(
+                  totalPnL,
+                )}. Check the Recent Trades list below.`,
+              );
+            });
+          }
+
+          dayContentHtml += `</div>`;
+          dayEl.innerHTML = dayContentHtml;
+          calendarEl.appendChild(dayEl);
+        }
+
+        const totalCells = calendarEl.children.length;
+        const nextDaysNeeded = 42 - totalCells;
+        for (let i = 1; i <= nextDaysNeeded; i++) {
+          const dayEl = document.createElement("div");
+          dayEl.classList.add("calendar-day", "inactive");
+          dayEl.innerHTML = `<div class="calendar-day-content"><span class="calendar-day-date">${i}</span></div>`;
+          calendarEl.appendChild(dayEl);
+        }
+      };
+
+      const navigateMonth = (direction) => {
+        const newDate = new Date(currentYear, currentMonth + direction, 1);
+        currentMonth = newDate.getMonth();
+        currentYear = newDate.getFullYear();
+        updateCalendar(trades);
+      };
+
+      const switchTab = (tab) => {
+        if (tab === "journal") {
+          journalTabBtn.classList.add("active-tab");
+          analyticsTabBtn.classList.remove("active-tab");
+          journalSection.classList.remove("hidden");
+          analyticsSection.classList.add("hidden");
+        } else {
+          analyticsTabBtn.classList.add("active-tab");
+          journalTabBtn.classList.remove("active-tab");
+          analyticsSection.classList.remove("hidden");
+          journalSection.classList.add("hidden");
+          updateAnalyticsDashboard(trades);
+        }
+      };
+
+      tradeForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(tradeForm);
+        const tradeData = {
+          symbol: formData.get("symbol").toUpperCase(),
+          side: formData.get("side"),
+          date: formData.get("date"),
+          session: formData.get("session"), // Capture session
+          profit: parseFloat(formData.get("profit")),
+          url: formData.get("url"),
+          notes: formData.get("notes"),
+        };
+        await saveTrade(tradeData);
+        tradeForm.reset();
+        document.getElementById("date").value = new Date()
+          .toISOString()
+          .split("T")[0];
+      });
+
+      // ... existing export code ...
+      const exportCsvBtn = document.getElementById("exportCsvBtn");
+      exportCsvBtn.addEventListener("click", () => {
+        if (trades.length === 0) {
+          alert("No trades");
+          return;
+        }
+        let csv = "id,date,session,symbol,side,profit,url,notes\n";
+        trades.forEach((t) => {
+          csv += `${t.id},${t.date},${t.session || ""},${t.symbol},${t.side},${t.profit},${t.url || ""},"${t.notes || ""}"\n`;
+        });
+        const link = document.createElement("a");
+        link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+        link.download = "journal.csv";
+        link.click();
+      });
+
+      journalTabBtn.addEventListener("click", () => switchTab("journal"));
+      analyticsTabBtn.addEventListener("click", () => switchTab("analytics"));
+      prevMonthBtn.addEventListener("click", () => navigateMonth(-1));
+      nextMonthBtn.addEventListener("click", () => navigateMonth(1));
+
+      // Settings Listeners
+      settingsBtn.addEventListener("click", toggleSettingsModal);
+      cancelSettingsBtn.addEventListener("click", toggleSettingsModal);
+      saveSettingsBtn.addEventListener("click", saveSettings);
+      settingsModal.addEventListener("click", (e) => {
+        if (e.target === settingsModal) toggleSettingsModal();
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const today = new Date();
+        currentMonth = today.getMonth();
+        currentYear = today.getFullYear();
+
+        document.getElementById("date").value = today
+          .toISOString()
+          .split("T")[0];
+        renderCalendar({});
+        initializeFirebase();
+      });
+    </script>
+  </body>
+</html>
