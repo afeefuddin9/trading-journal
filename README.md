@@ -1,4 +1,4 @@
-# AasimFxBook — Trading Journal v2.0
+# AasimFxBook — Trading Journal v2.0.
 
 > A professional single-file day trading journal with Firebase backend, real-time sync, and deep performance analytics. Built for serious traders who want to track, review, and improve their edge.
 
@@ -28,39 +28,41 @@
 
 ## What's New in v2.0
 
-| Area | v1.0 | v2.0 |
-|---|---|---|
-| Trade form label | "Side" | **Direction** |
-| Trade entry | No time field | **Entry Time** field added |
-| Trade notes | Notes only | Notes + **Mistake** + **Learning** |
-| Setup types | Not tracked | **Setup Type** dropdown (user-managed) |
-| Timeframe | Not tracked | **Timeframe** dropdown (M1–D1) |
-| Trade expand | No | **Click any trade** to see chart image, notes, mistake, learning |
-| Recent trades | All trades listed | **Last 5 only** with "View all" link |
-| Analytics filter | None | **Full filter bar** — symbol, setup, session, TF, direction, P&L type, date range |
-| Date filter | None | Last 7D / Last 30D / This Month / All Time / **Custom Date Range** |
-| Worst Trade logic | Smallest profit | **Biggest loss** (most negative P&L) |
-| R:R Distribution | Basic chart | **Interactive** — click a bar, see all trades in that bucket with pair names |
-| Setup performance | None | **Per-setup table** — win rate bar, avg P&L, best, worst |
-| Streak tracker | None | **W/L dots**, max streak counts, **plan adherence bars** |
-| Best Hours | None | **24-hour UTC heatmap** — green = profitable, red = loss |
-| Best Week of Month | None | **Week 1–5 breakdown** across all months |
-| Trade Logs | None | **Full searchable table** — all trades, expandable detail rows |
-| Reset protection | Single confirm | **Double confirmation** — requires typing `RESET` |
-| Setup type manager | Not editable | **Add/remove setup types** in Settings |
-| Branding | Generic icon | **AasimFxBook logo** + favicon |
+| Area               | v1.0              | v2.0                                                                              |
+| ------------------ | ----------------- | --------------------------------------------------------------------------------- |
+| Trade form label   | "Side"            | **Direction**                                                                     |
+| Trade entry        | No time field     | **Entry Time** field added                                                        |
+| Trade notes        | Notes only        | Notes + **Mistake** + **Learning**                                                |
+| Setup types        | Not tracked       | **Setup Type** dropdown (user-managed)                                            |
+| Timeframe          | Not tracked       | **Timeframe** dropdown (M1–D1)                                                    |
+| Trade expand       | No                | **Click any trade** to see chart image, notes, mistake, learning                  |
+| Recent trades      | All trades listed | **Last 5 only** with "View all" link                                              |
+| Analytics filter   | None              | **Full filter bar** — symbol, setup, session, TF, direction, P&L type, date range |
+| Date filter        | None              | Last 7D / Last 30D / This Month / All Time / **Custom Date Range**                |
+| Worst Trade logic  | Smallest profit   | **Biggest loss** (most negative P&L)                                              |
+| R:R Distribution   | Basic chart       | **Interactive** — click a bar, see all trades in that bucket with pair names      |
+| Setup performance  | None              | **Per-setup table** — win rate bar, avg P&L, best, worst                          |
+| Streak tracker     | None              | **W/L dots**, max streak counts, **plan adherence bars**                          |
+| Best Hours         | None              | **24-hour UTC heatmap** — green = profitable, red = loss                          |
+| Best Week of Month | None              | **Week 1–5 breakdown** across all months                                          |
+| Trade Logs         | None              | **Full searchable table** — all trades, expandable detail rows                    |
+| Reset protection   | Single confirm    | **Double confirmation** — requires typing `RESET`                                 |
+| Setup type manager | Not editable      | **Add/remove setup types** in Settings                                            |
+| Branding           | Generic icon      | **AasimFxBook logo** + favicon                                                    |
 
 ---
 
 ## Features
 
 ### Journal Tab
+
 - **Calendar** — monthly view, profit days green, loss days red, click a day to see P&L summary
 - **Journal Trade form** — Symbol, Direction, Date, Entry Time, Session, P&L, Setup Type, Timeframe, Position URL, Notes, Mistake, Learning
 - **Recent Trades** — last 5 trades, click any row to expand and view chart screenshot, notes, mistakes, and learnings
 - **Stats bar** — Initial Balance, Current Balance, Total P&L, Win Rate
 
 ### Analytics Tab
+
 - **Filter bar** — slice data by any combination of symbol, setup, session, timeframe, direction, P&L type, and date range
 - **8 metric cards** — balance, P&L, win ratio, Long/Short P&L, best/worst trade
 - **Risk cards** — max drawdown, max daily loss, expectancy (in R), avg hold time
@@ -76,6 +78,7 @@
 - **Trade Logs** — full searchable table with expandable rows showing chart image, notes, mistake, and learning
 
 ### Settings
+
 - Set initial account balance
 - Manage setup types — add your own setups (OB, FVG, etc.), remove ones you don't use
 - Reset all trade data with double confirmation
@@ -84,16 +87,16 @@
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | HTML5, Vanilla JavaScript (ES6 Modules) |
-| Styling | Tailwind CSS via CDN + custom CSS variables |
-| Charts | Chart.js via CDN |
-| Icons | Font Awesome via CDN |
-| Database | Firebase Firestore (NoSQL, real-time) |
-| Auth | Firebase Anonymous Auth |
-| Hosting | AWS S3 (static website) |
-| MT5 Bridge | Python (`mt5_to_firebase.py`) |
+| Layer      | Technology                                  |
+| ---------- | ------------------------------------------- |
+| Frontend   | HTML5, Vanilla JavaScript (ES6 Modules)     |
+| Styling    | Tailwind CSS via CDN + custom CSS variables |
+| Charts     | Chart.js via CDN                            |
+| Icons      | Font Awesome via CDN                        |
+| Database   | Firebase Firestore (NoSQL, real-time)       |
+| Auth       | Firebase Anonymous Auth                     |
+| Hosting    | AWS S3 (static website)                     |
+| MT5 Bridge | Python (`mt5_to_firebase.py`)               |
 
 ---
 
@@ -119,12 +122,12 @@ Open `day_trading_journal_v2.html` in a text editor and find the Firebase config
 
 ```javascript
 const firebaseConfig = {
-  apiKey:           "AIzaSyB4w3eFdIjigrLIT1MoXIm_WteVpL6gdfA",
-  authDomain:       "trading-journal-2025-09.firebaseapp.com",
-  projectId:        "trading-journal-2025-09",
-  storageBucket:    "trading-journal-2025-09.firebasestorage.app",
-  messagingSenderId:"13238776469",
-  appId:            "1:13238776469:web:60ab5bb8b06035222e619c"
+  apiKey: "AIzaSyB4w3eFdIjigrLIT1MoXIm_WteVpL6gdfA",
+  authDomain: "trading-journal-2025-09.firebaseapp.com",
+  projectId: "trading-journal-2025-09",
+  storageBucket: "trading-journal-2025-09.firebasestorage.app",
+  messagingSenderId: "13238776469",
+  appId: "1:13238776469:web:60ab5bb8b06035222e619c",
 };
 ```
 
@@ -285,26 +288,27 @@ Your balance is saved to Firestore and will persist across sessions.
 
 Fill in the **Journal Trade** form on the left:
 
-| Field | Notes |
-|---|---|
-| **Symbol** | Ticker in uppercase — e.g. `XAUUSD`, `BTCUSD`, `EURUSD` |
-| **Direction** | Long (buy) or Short (sell) |
-| **Date** | Trade date |
-| **Time (Entry)** | Entry time in your local timezone — used for hour-of-day analysis |
-| **Session** | Asian, London, or New York |
-| **P&L ($)** | Net profit or loss in dollars — use negative for losses (e.g. `-83`) |
-| **Setup Type** | The pattern/setup that triggered your entry |
-| **Timeframe** | Entry timeframe — M1, M5, M15, H1, H4, D1 |
-| **Position URL** | Link to a TradingView screenshot or any image URL of your chart |
-| **Notes** | Entry reasoning, confluences, what you observed |
-| **Mistake** | What you did wrong on this trade (if anything) |
-| **Learning** | What you will do differently next time |
+| Field            | Notes                                                                |
+| ---------------- | -------------------------------------------------------------------- |
+| **Symbol**       | Ticker in uppercase — e.g. `XAUUSD`, `BTCUSD`, `EURUSD`              |
+| **Direction**    | Long (buy) or Short (sell)                                           |
+| **Date**         | Trade date                                                           |
+| **Time (Entry)** | Entry time in your local timezone — used for hour-of-day analysis    |
+| **Session**      | Asian, London, or New York                                           |
+| **P&L ($)**      | Net profit or loss in dollars — use negative for losses (e.g. `-83`) |
+| **Setup Type**   | The pattern/setup that triggered your entry                          |
+| **Timeframe**    | Entry timeframe — M1, M5, M15, H1, H4, D1                            |
+| **Position URL** | Link to a TradingView screenshot or any image URL of your chart      |
+| **Notes**        | Entry reasoning, confluences, what you observed                      |
+| **Mistake**      | What you did wrong on this trade (if anything)                       |
+| **Learning**     | What you will do differently next time                               |
 
 Click **Save Trade** — it saves to Firestore in real time and appears instantly in the Recent Trades list.
 
 ### Reviewing a trade
 
 Click any trade row in Recent Trades to expand it. You will see:
+
 - Chart image loaded from your Position URL
 - Your notes, mistake, and learning
 - A link to open the chart in a new tab
@@ -361,12 +365,14 @@ artifacts/
 Your setup types are stored in Firestore and loaded dynamically into the form dropdown each time the app opens.
 
 **To add a setup:**
+
 1. Click ⚙️ Settings
 2. Type the setup name in the input at the bottom of the Setup Types section
 3. Press **Enter** or click **Add**
 4. Click **Save Settings**
 
 **To remove a setup:**
+
 1. Click ⚙️ Settings
 2. Click the **✕** next to any setup type you want to remove
 3. Click **Save Settings**
@@ -405,24 +411,26 @@ The app uses a double-confirmation system to prevent accidental deletes — you 
 The Analytics tab already shows a preview of the upcoming AI Pattern Analyzer. This feature will use the Claude API to read your full trade history and surface behavioral patterns.
 
 **What it will detect:**
+
 - Which setups have the highest win rate per session
 - Whether you overtrade after consecutive losses
 - Your best symbol + session + timeframe combination
 - Patterns in your mistakes across trades
 
 **Fields already captured that feed the AI (v2.0):**
+
 - Symbol, Direction, Date, Time, Session, Setup Type, Timeframe, P&L, Notes, Mistake, Learning
 
 **Additional fields to add in Phase 2 for richer analysis:**
 
-| Field | Why it matters |
-|---|---|
-| Actual R:R achieved | Measures execution quality vs plan |
-| Planned R:R | Tells the AI if you're cutting winners or widening stops |
-| Trade Outcome | Hit TP / Hit SL / Manual Close — detects emotional exits |
-| Emotion Tag | Calm / FOMO / Revenge / Hesitant — correlates with P&L |
-| Followed Plan (Yes/No) | Separates disciplined trades from reactive ones |
-| Exit Time | Enables accurate hold duration calculation |
+| Field                  | Why it matters                                           |
+| ---------------------- | -------------------------------------------------------- |
+| Actual R:R achieved    | Measures execution quality vs plan                       |
+| Planned R:R            | Tells the AI if you're cutting winners or widening stops |
+| Trade Outcome          | Hit TP / Hit SL / Manual Close — detects emotional exits |
+| Emotion Tag            | Calm / FOMO / Revenge / Hesitant — correlates with P&L   |
+| Followed Plan (Yes/No) | Separates disciplined trades from reactive ones          |
+| Exit Time              | Enables accurate hold duration calculation               |
 
 The more fields you fill per trade, the deeper and more accurate the AI insights will be. Even with Phase 1 fields alone, the AI can detect session-level and setup-level patterns.
 
@@ -468,6 +476,7 @@ python mt5_to_firebase.py
 ```
 
 The script:
+
 1. Connects to your MT5 terminal
 2. Fetches deals from the last N days
 3. Filters out deposits/withdrawals
@@ -525,6 +534,7 @@ The v1.0 app stored `side: "Long"/"Short"`. The v2.0 app reads `direction || sid
 ## Changelog
 
 ### v2.0 — June 2026
+
 - Added: Entry Time field for hour-of-day analysis
 - Added: Direction field (replaces "Side", backward compatible with v1.0 data)
 - Added: Setup Type dropdown (user-managed from Settings)
@@ -551,6 +561,7 @@ The v1.0 app stored `side: "Long"/"Short"`. The v2.0 app reads `direction || sid
 - Fixed: Old v1.0 trade data compatibility (side → direction fallback)
 
 ### v1.0 — 2025
+
 - Initial release
 - Journal tab with calendar, trade form, recent trades
 - Analytics tab with equity curve, session chart, best instruments, day of week chart
@@ -561,4 +572,4 @@ The v1.0 app stored `side: "Long"/"Short"`. The v2.0 app reads `direction || sid
 
 ---
 
-*Built for AasimFx — Trading Journal for serious traders.*
+_Built for AasimFx — Trading Journal for serious traders._
