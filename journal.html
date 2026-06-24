@@ -339,17 +339,19 @@
             </select>
           </div>
         </div>
-        <!-- Row 2: Date + Time -->
-        <div class="grid grid-cols-2 gap-3">
+        <!-- Row 2: Date + Entry Time + Exit Time -->
+        <div class="grid grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Date</label>
             <input type="date" id="date" name="date" class="w-full px-3 py-2 input-field text-sm" required/>
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">
-              Time (Entry) 
-            </label>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Entry Time</label>
             <input type="time" id="entryTime" name="entryTime" class="w-full px-3 py-2 input-field text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Exit Time</label>
+            <input type="time" id="exitTime" name="exitTime" class="w-full px-3 py-2 input-field text-sm"/>
           </div>
         </div>
         <!-- Row 3: Session + P&L -->
@@ -384,7 +386,7 @@
             <select id="timeframe" name="timeframe" class="w-full px-3 py-2 select-field text-sm">
               <option value="">— Select TF —</option>
               <option value="M1">M1</option><option value="M5">M5</option>
-              <option value="M15">M15</option><option value="H1">H1</option>
+              <option value="M15">M15</option><option value="M30">M30</option><option value="H1">H1</option>
               <option value="H4">H4</option><option value="D1">D1</option>
             </select>
           </div>
@@ -455,7 +457,7 @@
     <select id="fTF" class="filter-select">
       <option value="">All Timeframes</option>
       <option value="M1">M1</option><option value="M5">M5</option>
-      <option value="M15">M15</option><option value="H1">H1</option>
+      <option value="M15">M15</option><option value="M30">M30</option><option value="H1">H1</option>
       <option value="H4">H4</option><option value="D1">D1</option>
     </select>
     <select id="fDirection" class="filter-select">
@@ -806,6 +808,106 @@
   </div>
 </div>
 
+
+<!-- ═══════════════════════════ EDIT TRADE MODAL ═══════════════════════════ -->
+<div id="editTradeModal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="max-width:560px">
+    <h2 class="text-base font-bold flex items-center gap-2 mb-4">
+      <i class="fas fa-pen-to-square" style="color:var(--accent-color)"></i> Edit Trade
+    </h2>
+    <input type="hidden" id="editTradeId"/>
+    <div class="space-y-3">
+      <!-- Symbol + Direction -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Symbol</label>
+          <input type="text" id="editSymbol" class="w-full px-3 py-2 input-field text-sm" placeholder="XAUUSD"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Direction</label>
+          <select id="editDirection" class="w-full px-3 py-2 select-field text-sm">
+            <option value="Long">Long ↑</option>
+            <option value="Short">Short ↓</option>
+          </select>
+        </div>
+      </div>
+      <!-- Date + Entry Time + Exit Time -->
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Date</label>
+          <input type="date" id="editDate" class="w-full px-3 py-2 input-field text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Entry Time</label>
+          <input type="time" id="editEntryTime" class="w-full px-3 py-2 input-field text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Exit Time</label>
+          <input type="time" id="editExitTime" class="w-full px-3 py-2 input-field text-sm"/>
+        </div>
+      </div>
+      <!-- Session + P&L -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Session</label>
+          <select id="editSession" class="w-full px-3 py-2 select-field text-sm">
+            <option value="Asian">Asian</option>
+            <option value="London">London</option>
+            <option value="New York">New York</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">P&amp;L ($)</label>
+          <input type="number" step="0.01" id="editProfit" class="w-full px-3 py-2 input-field text-sm" placeholder="0.00"/>
+        </div>
+      </div>
+      <!-- Setup + Timeframe -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Setup Type</label>
+          <select id="editSetupType" class="w-full px-3 py-2 select-field text-sm">
+            <option value="">— Select Setup —</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Timeframe</label>
+          <select id="editTimeframe" class="w-full px-3 py-2 select-field text-sm">
+            <option value="">— Select TF —</option>
+            <option value="M1">M1</option><option value="M5">M5</option>
+            <option value="M15">M15</option><option value="H1">H1</option>
+            <option value="H4">H4</option><option value="D1">D1</option>
+          </select>
+        </div>
+      </div>
+      <!-- URL -->
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Position URL</label>
+        <input type="url" id="editUrl" class="w-full px-3 py-2 input-field text-sm" placeholder="https://tradingview.com/x/..."/>
+      </div>
+      <!-- Notes -->
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Notes</label>
+        <textarea id="editNotes" rows="2" class="w-full px-3 py-2 input-field text-sm" style="resize:vertical"></textarea>
+      </div>
+      <!-- Mistake + Learning -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--danger-color)">Mistake</label>
+          <textarea id="editMistake" rows="2" class="w-full px-3 py-2 input-field text-sm" style="resize:vertical" placeholder="What went wrong?"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--profit-color)">Learning</label>
+          <textarea id="editLearning" rows="2" class="w-full px-3 py-2 input-field text-sm" style="resize:vertical" placeholder="What will you do differently?"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mt-4">
+      <button id="cancelEditBtn" class="button py-2 rounded-lg font-semibold text-sm">Cancel</button>
+      <button id="saveEditBtn" class="btn-save-primary py-2" style="font-size:.875rem">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════ RESET CONFIRM MODAL ═══════════════════════════ -->
 <div id="resetModal" class="modal-overlay" style="display:none">
   <div class="modal-box text-center space-y-4" style="border-color:rgba(214,90,90,.3)">
@@ -1038,13 +1140,20 @@ const fmtCalendar = v => {
   const c = v>=0?"text-profit-color":"text-danger-color";
   return `<span class="${c} calendar-day-pnl">${fmtPlain(v)}</span>`;
 };
-const holdDuration = (dateStr, timeStr) => {
-  if (!timeStr) return "";
-  return ""; // populated if exit time added in Phase 2
-};
 const calcHoldMins = trade => {
-  if (!trade.entryTime) return null;
-  return null; // Phase 2: needs exit time
+  if (!trade.entryTime || !trade.exitTime) return null;
+  try {
+    const [eh, em] = trade.entryTime.split(":").map(Number);
+    const [xh, xm] = trade.exitTime.split(":").map(Number);
+    let mins = (xh * 60 + xm) - (eh * 60 + em);
+    if (mins < 0) mins += 24 * 60; // overnight trade
+    return mins;
+  } catch(e) { return null; }
+};
+const fmtHold = mins => {
+  if (mins === null) return "—";
+  if (mins < 60) return mins + "m";
+  return Math.floor(mins/60) + "h " + (mins%60) + "m";
 };
 const getFilteredTrades = () => {
   let t = [...trades];
@@ -1110,7 +1219,7 @@ const saveSettings = async () => {
     await setDoc(getSettingsRef(),{initialBalance:bal, setupTypes:setupTypes},{merge:true});
     initialBalance = bal;
     updateAllDashboards(trades);
-    toggleSettings(false);
+    if(window._closeSettings) window._closeSettings();
   } catch(e) { alert("Failed to save settings."); }
 };
 
@@ -1213,6 +1322,7 @@ const renderTradesList = allTrades => {
         <span class="text-xs" style="color:var(--accent-color)">${trade.date}${timeStr}</span>
         ${trade.url?`<a href="${trade.url}" target="_blank" class="view-link-btn" onclick="event.stopPropagation()">&#128065; View</a>`:""}
         <span class="ml-auto text-sm font-bold ${isProft?"text-profit-color":"text-danger-color"}">${isProft?"+":""}${trade.profit.toFixed(2)}</span>
+        <button class="edit-trade-btn text-xs px-1.5 py-0.5 rounded transition-colors" style="color:#a5a3ff;background:rgba(115,113,255,.1);border:1px solid rgba(115,113,255,.18)" data-id="${trade.id}">&#9998;</button>
         <button class="delete-trade-btn text-xs px-1.5 py-0.5 rounded hover:text-danger-color transition-colors" style="color:var(--accent-color)" data-id="${trade.id}">&#128465;</button>
       </div>
       <div class="trade-expand-panel hidden" id="expand-${trade.id}">
@@ -1233,9 +1343,14 @@ const renderTradesList = allTrades => {
 
     // Toggle expand
     wrapper.querySelector(".trade-row-item").addEventListener("click", e => {
-      if (e.target.closest(".delete-trade-btn")||e.target.closest("a")) return;
+      if (e.target.closest(".delete-trade-btn")||e.target.closest(".edit-trade-btn")||e.target.closest("a")) return;
       const panel = document.getElementById(`expand-${trade.id}`);
       panel.classList.toggle("hidden");
+    });
+    // Edit
+    wrapper.querySelector(".edit-trade-btn").addEventListener("click", e => {
+      e.stopPropagation();
+      openEditModal(trade);
     });
     // Delete
     wrapper.querySelector(".delete-trade-btn").addEventListener("click", e => {
@@ -1374,7 +1489,12 @@ const updateAnalyticsMetrics = t => {
   const winRate=t.length>0?wins.length/t.length:0;
   const exp=((winRate*avgW)-((1-winRate)*avgL))/avgL;
   document.getElementById("expectancyDisplay").innerHTML=`<span class="${exp>=0?"text-profit-color":"text-danger-color"}">${exp>=0?"+":""}${exp.toFixed(2)}R</span>`;
-  document.getElementById("avgHoldDisplay").innerHTML=`<span class="text-profit-color">— min</span>`;
+  // Avg hold time from real exit/entry times
+  const holdData = t.map(x => calcHoldMins(x)).filter(m => m !== null);
+  const avgHold = holdData.length > 0 ? Math.round(holdData.reduce((s,m)=>s+m,0)/holdData.length) : null;
+  document.getElementById("avgHoldDisplay").innerHTML = avgHold !== null
+    ? `<span class="text-profit-color">${fmtHold(avgHold)}</span>`
+    : `<span style="color:var(--accent-color)">— (add exit times)</span>`;
 };
 
 // ── CHARTS ────────────────────────────────────────────────────────────
@@ -1612,7 +1732,10 @@ const renderTradeLogs = t => {
       <td class="text-xs" style="color:var(--accent-color)">—</td>
       <td class="font-bold text-xs ${isPft?"text-profit-color":"text-danger-color"}">${isPft?"+":""}${trade.profit.toFixed(2)}</td>
       <td>${trade.url?`<a href="${trade.url}" target="_blank" class="view-link-btn">&#128065; View</a>`:`<span class="text-xs" style="color:var(--accent-color)">—</span>`}</td>
-      <td><button class="tlog-expand-btn text-xs px-2 py-0.5 rounded" style="background:var(--input-bg);border:1px solid var(--border-color);color:var(--accent-color)" data-id="${trade.id}">&#8897;</button></td>`;
+      <td class="flex gap-1 justify-end">
+        <button class="tlog-edit-btn text-xs px-2 py-0.5 rounded" style="background:rgba(115,113,255,.12);border:1px solid rgba(115,113,255,.2);color:#a5a3ff" data-id="${trade.id}" title="Edit">&#9998;</button>
+        <button class="tlog-expand-btn text-xs px-2 py-0.5 rounded" style="background:var(--input-bg);border:1px solid var(--border-color);color:var(--accent-color)" data-id="${trade.id}">&#8897;</button>
+      </td>`;
     tbody.appendChild(tr);
 
     // Expand row
@@ -1634,10 +1757,75 @@ const renderTradeLogs = t => {
       expRow.classList.toggle("hidden");
       tr.querySelector(".tlog-expand-btn").textContent=expRow.classList.contains("hidden")?"⊕":"⊖";
     });
+    tr.querySelector(".tlog-edit-btn").addEventListener("click",()=>{
+      openEditModal(trade);
+    });
   });
 };
 
-// ── FORM SUBMIT ───────────────────────────────────────────────────────
+// ── EDIT TRADE ─────────────────────────────────────────────────────────
+const openEditModal = trade => {
+  document.getElementById("editTradeId").value = trade.id;
+  document.getElementById("editSymbol").value = trade.symbol||"";
+  document.getElementById("editDirection").value = trade.direction||trade.side||"Long";
+  document.getElementById("editDate").value = trade.date||"";
+  document.getElementById("editEntryTime").value = trade.entryTime||"";
+  document.getElementById("editExitTime").value = trade.exitTime||"";
+  document.getElementById("editSession").value = trade.session||"Asian";
+  document.getElementById("editProfit").value = trade.profit||"";
+  document.getElementById("editSetupType").value = trade.setupType||"";
+  document.getElementById("editTimeframe").value = trade.timeframe||"";
+  document.getElementById("editUrl").value = trade.url||"";
+  document.getElementById("editNotes").value = trade.notes||"";
+  document.getElementById("editMistake").value = trade.mistake||"";
+  document.getElementById("editLearning").value = trade.learning||"";
+  // Refresh setup dropdown
+  const sel = document.getElementById("editSetupType");
+  sel.innerHTML = '<option value="">— Select Setup —</option>';
+  setupTypes.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
+  sel.value = trade.setupType||"";
+  document.getElementById("editTradeModal").style.display = "flex";
+};
+window._openEditModal = openEditModal;
+
+const closeEditModal = () => { document.getElementById("editTradeModal").style.display = "none"; };
+window._closeEditModal = closeEditModal;
+
+const saveEditedTrade = async () => {
+  const id = document.getElementById("editTradeId").value;
+  if (!id) return;
+  const updated = {
+    symbol: (document.getElementById("editSymbol").value||"").toUpperCase().trim(),
+    direction: document.getElementById("editDirection").value,
+    side: document.getElementById("editDirection").value,
+    date: document.getElementById("editDate").value,
+    entryTime: document.getElementById("editEntryTime").value||"",
+    exitTime: document.getElementById("editExitTime").value||"",
+    session: document.getElementById("editSession").value,
+    profit: parseFloat(document.getElementById("editProfit").value)||0,
+    setupType: document.getElementById("editSetupType").value||"",
+    timeframe: document.getElementById("editTimeframe").value||"",
+    url: document.getElementById("editUrl").value||"",
+    notes: document.getElementById("editNotes").value||"",
+    mistake: document.getElementById("editMistake").value||"",
+    learning: document.getElementById("editLearning").value||"",
+  };
+  const btn = document.getElementById("saveEditBtn");
+  btn.textContent = "Saving..."; btn.disabled = true;
+  try {
+    await setDoc(doc(getTradesCol(), id), {...updated, updatedAt: new Date().toISOString()}, {merge:true});
+    closeEditModal();
+  } catch(e) { alert("Save failed. Try again."); console.error(e); }
+  finally { btn.textContent = "Save Changes"; btn.disabled = false; }
+};
+
+document.getElementById("saveEditBtn").addEventListener("click", saveEditedTrade);
+document.getElementById("cancelEditBtn").addEventListener("click", closeEditModal);
+document.getElementById("editTradeModal").addEventListener("click", e => {
+  if (e.target === document.getElementById("editTradeModal")) closeEditModal();
+});
+
+// ── FORM SUBMIT ─────────────────────────────────────────────────────────
 document.getElementById("tradeForm").addEventListener("submit", async e => {
   e.preventDefault();
   const fd=new FormData(e.target);
@@ -1647,6 +1835,7 @@ document.getElementById("tradeForm").addEventListener("submit", async e => {
     side:fd.get("direction")||"Long", // backward compat with v1 data
     date:fd.get("date"),
     entryTime:fd.get("entryTime")||"",
+    exitTime:fd.get("exitTime")||"",
     session:fd.get("session"),
     profit:parseFloat(fd.get("profit")),
     setupType:fd.get("setupType")||"",
@@ -1692,44 +1881,12 @@ document.getElementById("analyticsTabBtn").addEventListener("click",()=>switchTa
 document.getElementById("viewAllLink").addEventListener("click",()=>switchTab("analytics"));
 
 // ── CALENDAR NAV ──────────────────────────────────────────────────────
-document.getElementById("prevMonthBtn").addEventListener("click",()=>{
-  const d=new Date(currentYear,currentMonth-1,1); currentMonth=d.getMonth(); currentYear=d.getFullYear();
-  updateCalendar(trades);
-});
-document.getElementById("nextMonthBtn").addEventListener("click",()=>{
-  const d=new Date(currentYear,currentMonth+1,1); currentMonth=d.getMonth(); currentYear=d.getFullYear();
-  updateCalendar(trades);
-});
-
 // ── SETTINGS MODAL ────────────────────────────────────────────────────
 
 
 
 // ── FILTERS ───────────────────────────────────────────────────────────
-document.getElementById("fDateRange").addEventListener("change",e=>{
-  document.getElementById("customDateWrap").style.display = (e.target.value==="custom") ? "flex" : "none";
-});
-document.getElementById("applyFiltersBtn").addEventListener("click",()=>{
-  activeFilters={
-    symbol:document.getElementById("fSymbol").value,
-    setup:document.getElementById("fSetup").value,
-    session:document.getElementById("fSession").value,
-    tf:document.getElementById("fTF").value,
-    direction:document.getElementById("fDirection").value,
-    pnlType:document.getElementById("fPnlType").value,
-    dateRange:document.getElementById("fDateRange").value,
-    dateFrom:document.getElementById("fDateFrom").value,
-    dateTo:document.getElementById("fDateTo").value
-  };
-  updateAllDashboards(trades);
-});
-document.getElementById("resetFiltersBtn").addEventListener("click",()=>{
-  ["fSymbol","fSetup","fSession","fTF","fDirection","fPnlType"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("fDateRange").value="30";
-  document.getElementById("customDateWrap").style.display = "none";
-  activeFilters={};
-  updateAllDashboards(trades);
-});
+
 
 // ── RR BUCKET FILTER ─────────────────────────────────────────────────
 
@@ -1808,17 +1965,107 @@ window._rrFilterChange = val => {
   
   
   
-  document.getElementById("prevMonthBtn").addEventListener("click",()=>{
-    const d=new Date(currentYear,currentMonth-1,1); currentMonth=d.getMonth(); currentYear=d.getFullYear();
-    updateCalendar(trades);
-  });
-  document.getElementById("nextMonthBtn").addEventListener("click",()=>{
-    const d=new Date(currentYear,currentMonth+1,1); currentMonth=d.getMonth(); currentYear=d.getFullYear();
-    updateCalendar(trades);
-  });
-
   initFirebase();
 })();
 </script>
+
+<!-- ═══════════════════ EDIT TRADE MODAL ═══════════════════ -->
+<div id="editTradeModal" class="modal-overlay" style="display:none">
+  <div class="modal-box space-y-4" style="max-width:560px;width:100%">
+    <h2 class="text-base font-bold flex items-center gap-2" style="border-bottom:1px solid var(--border-color);padding-bottom:12px">
+      <i class="fas fa-pen" style="color:var(--accent-color)"></i> Edit Trade
+    </h2>
+    <input type="hidden" id="editTradeId"/>
+    <!-- Row 1: Symbol + Direction -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Symbol</label>
+        <input type="text" id="editSymbol" class="w-full px-3 py-2 input-field text-sm" placeholder="e.g. XAUUSD"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Direction</label>
+        <select id="editDirection" class="w-full px-3 py-2 select-field text-sm">
+          <option value="Long">Long ↑</option>
+          <option value="Short">Short ↓</option>
+        </select>
+      </div>
+    </div>
+    <!-- Row 2: Date + Entry + Exit -->
+    <div class="grid grid-cols-3 gap-3">
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Date</label>
+        <input type="date" id="editDate" class="w-full px-3 py-2 input-field text-sm"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Entry Time</label>
+        <input type="time" id="editEntryTime" class="w-full px-3 py-2 input-field text-sm"/>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Exit Time</label>
+        <input type="time" id="editExitTime" class="w-full px-3 py-2 input-field text-sm"/>
+      </div>
+    </div>
+    <!-- Row 3: Session + P&L -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Session</label>
+        <select id="editSession" class="w-full px-3 py-2 select-field text-sm">
+          <option value="Asian">Asian</option>
+          <option value="London">London</option>
+          <option value="New York">New York</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">P&amp;L ($)</label>
+        <input type="number" step="0.01" id="editProfit" class="w-full px-3 py-2 input-field text-sm" placeholder="0.00"/>
+      </div>
+    </div>
+    <!-- Row 4: Setup + Timeframe -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Setup Type</label>
+        <select id="editSetupType" class="w-full px-3 py-2 select-field text-sm">
+          <option value="">— Select Setup —</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Timeframe</label>
+        <select id="editTimeframe" class="w-full px-3 py-2 select-field text-sm">
+          <option value="">— Select TF —</option>
+          <option value="M1">M1</option><option value="M5">M5</option>
+          <option value="M15">M15</option><option value="M30">M30</option>
+          <option value="H1">H1</option><option value="H4">H4</option><option value="D1">D1</option>
+        </select>
+      </div>
+    </div>
+    <!-- Row 5: URL -->
+    <div>
+      <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Position URL</label>
+      <input type="url" id="editUrl" class="w-full px-3 py-2 input-field text-sm" placeholder="https://tradingview.com/x/..."/>
+    </div>
+    <!-- Row 6: Notes -->
+    <div>
+      <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--accent-color)">Notes</label>
+      <textarea id="editNotes" rows="2" class="w-full px-3 py-2 input-field text-sm" placeholder="Entry reasoning, confluences..."></textarea>
+    </div>
+    <!-- Row 7: Mistake + Learning -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--danger-color)">Mistake</label>
+        <textarea id="editMistake" rows="2" class="w-full px-3 py-2 input-field text-sm" placeholder="What went wrong?"></textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider mb-1" style="color:var(--profit-color)">Learning</label>
+        <textarea id="editLearning" rows="2" class="w-full px-3 py-2 input-field text-sm" placeholder="What to do differently?"></textarea>
+      </div>
+    </div>
+    <!-- Buttons -->
+    <div class="grid grid-cols-2 gap-3" style="padding-top:4px">
+      <button id="cancelEditBtn" class="button py-2 rounded-lg font-semibold text-sm">Cancel</button>
+      <button id="saveEditBtn" class="btn-save-primary py-2"><i class="fas fa-floppy-disk mr-2"></i>Save Changes</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
